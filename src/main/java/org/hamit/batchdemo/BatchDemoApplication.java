@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = "org.hamit.batchdemo"
+)
 public class BatchDemoApplication {
 
     public static void main(String[] args) {
