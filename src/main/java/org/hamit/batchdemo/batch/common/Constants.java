@@ -1,4 +1,4 @@
-package org.hamit.batchdemo.batch;
+package org.hamit.batchdemo.batch.common;
 
 public class Constants{
     public Constants(){}

@@ -1,9 +1,9 @@
-package org.hamit.batchdemo.batch;
+package org.hamit.batchdemo.batch.common;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class BaseBatch  {
@@ -17,7 +17,7 @@ public class BaseBatch  {
 
     @Bean
     public PlatformTransactionManager transactionManager() {
-        return new JpaTransactionManager();
+        return new JdbcTransactionManager();
     }
 
 }
