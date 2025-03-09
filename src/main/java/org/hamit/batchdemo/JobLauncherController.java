@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class JobLauncherController {
     private final JobLauncher jobLauncher;
-    @Qualifier("firstJob")
+    
+    @Qualifier("sampleJob")
     private final Job job;
 
     @GetMapping("/job1")
     public void runJob() throws Exception{
         jobLauncher.run(job,new JobParameters());
     }
+
 }
