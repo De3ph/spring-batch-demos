@@ -9,7 +9,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Configuration
-public abstract class BaseBatch implements InitializingBean {
+public abstract class BaseBatch<R, W> extends BaseListeners<R,W> implements InitializingBean {
     @Bean
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager();

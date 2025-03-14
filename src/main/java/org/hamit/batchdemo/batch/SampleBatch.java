@@ -2,7 +2,6 @@ package org.hamit.batchdemo.batch;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.hamit.batchdemo.batch.base.BaseBatch;
 import org.hamit.batchdemo.dao.entity.Order;
 import org.hamit.batchdemo.dao.entity.Product;
@@ -20,8 +19,6 @@ import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +27,7 @@ import java.util.Map;
 @EnableBatchProcessing
 @Slf4j
 @RequiredArgsConstructor
-public class SampleBatch extends BaseBatch {
+public class SampleBatch extends BaseBatch<Product, Order> {
 
     private static final Integer PAGE_SIZE = 20;
     private final ProductRepository productRepository;
@@ -41,6 +38,7 @@ public class SampleBatch extends BaseBatch {
     public Job job(JobRepository jobRepository) {
         return new JobBuilder("sampleJob", jobRepository)
                 .start(step1(jobRepository))
+                .listener(jobExecutionListener())
                 .build();
     }
 
@@ -48,9 +46,12 @@ public class SampleBatch extends BaseBatch {
     public Step step1(JobRepository jobRepository) {
         return new StepBuilder("step1", jobRepository)
                 .<Product, Order>chunk(PAGE_SIZE, transactionManager())
+                .listener(stepExecutionListener())
                 .reader(ItemReader())
+                .listener(getItemReadListener())
                 .processor(ItemProcessor())
                 .writer(ItemWriter())
+                .listener(getItemWriteListener())
                 .allowStartIfComplete(true)
                 .build();
     }
