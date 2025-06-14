@@ -1,12 +1,15 @@
 package org.hamit.batchdemo.batch;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
+
 import org.hamit.batchdemo.batch.base.BaseBatch;
 import org.hamit.batchdemo.dao.entity.Order;
 import org.hamit.batchdemo.dao.entity.Product;
 import org.hamit.batchdemo.dao.repository.OrderRepository;
 import org.hamit.batchdemo.dao.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -20,31 +23,30 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
-import java.util.Map;
-
 @Configuration
 @EnableBatchProcessing
-@Slf4j
-@RequiredArgsConstructor
 public class SampleBatch extends BaseBatch<Product, Order> {
-
+    private static final Logger log = LoggerFactory.getLogger(SampleBatch.class);
     private static final Integer PAGE_SIZE = 20;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
+    public SampleBatch(ProductRepository productRepository, OrderRepository orderRepository) {
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+    }
 
-    @Bean("sampleJob")
+    @Bean(BatchConstants.SAMPLE_JOB_NAME)
     public Job job(JobRepository jobRepository) {
-        return new JobBuilder("sampleJob", jobRepository)
+        return new JobBuilder(BatchConstants.SAMPLE_JOB_NAME, jobRepository)
                 .start(step1(jobRepository))
                 .listener(jobExecutionListener())
                 .build();
     }
 
-    @Bean
+    @Bean(BatchConstants.SAMPLE_JOB_STEP)
     public Step step1(JobRepository jobRepository) {
-        return new StepBuilder("step1", jobRepository)
+        return new StepBuilder(BatchConstants.SAMPLE_JOB_STEP, jobRepository)
                 .<Product, Order>chunk(PAGE_SIZE, transactionManager())
                 .listener(stepExecutionListener())
                 .reader(ItemReader())
@@ -84,5 +86,10 @@ public class SampleBatch extends BaseBatch<Product, Order> {
         writer.setRepository(orderRepository);
         writer.setMethodName("save");
         return writer;
+    }
+
+    @Override
+    public String getBatchConfigPrefix() {
+        return BatchConstants.DEFAULT_BATCH_CONFIG_PREFIX;
     }
 }

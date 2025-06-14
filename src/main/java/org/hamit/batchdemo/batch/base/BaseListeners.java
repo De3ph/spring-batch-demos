@@ -1,16 +1,25 @@
 package org.hamit.batchdemo.batch.base;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.Chunk;
 
-@Slf4j
+import lombok.NonNull;
+
 public abstract class BaseListeners<R, W> {
+    private static final Logger log = LoggerFactory.getLogger(BaseListeners.class);
+
     public JobExecutionListener jobExecutionListener() {
         return new JobExecutionListener() {
             @Override
-            public void beforeJob(@NonNull JobExecution jobExecution) {
+            public void beforeJob(JobExecution jobExecution) {
                 log.info("{} job execution starting...", jobExecution.getJobInstance().getJobName());
             }
 

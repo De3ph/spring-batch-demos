@@ -23,6 +23,8 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     defer-datasource-initialization: true
 
-
-
-
+batch:
+  default:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 25
