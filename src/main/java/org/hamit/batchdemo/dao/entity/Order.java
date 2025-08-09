@@ -1,17 +1,13 @@
 package org.hamit.batchdemo.dao.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,28 +21,13 @@ public class Order {
     @Id
     private Long id;
 
-    @OneToMany(mappedBy = "orderId")
+    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Product> products = new ArrayList<>();
 
     public void addProduct(Product product) {
         products.add(product);
-        product.setOrderId(this);
+        product.setOrder(this);
     }
 
-    // Manual getters and setters to fix compilation issues
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
 }

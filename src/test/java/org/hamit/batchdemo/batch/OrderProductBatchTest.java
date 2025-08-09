@@ -14,8 +14,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SampleBatchTest {
+public class OrderProductBatchTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -45,7 +45,7 @@ public class SampleBatchTest {
     private Environment environment;
 
     @InjectMocks
-    private SampleBatch sampleBatch;
+    private OrderProductBatch orderProductBatch;
 
     private Product testProduct;
     private List<Product> testProducts;
@@ -79,7 +79,7 @@ public class SampleBatchTest {
     @Test
     void testGetBatchConfigPrefix() {
         // When
-        String configPrefix = sampleBatch.getBatchConfigPrefix();
+        String configPrefix = orderProductBatch.getBatchConfigPrefix();
 
         // Then
         assertEquals(BatchConstants.DEFAULT_BATCH_CONFIG_PREFIX, configPrefix);
@@ -88,39 +88,39 @@ public class SampleBatchTest {
     @Test
     void testJobCreation() {
         // When
-        Job job = sampleBatch.job(jobRepository);
+        Job job = orderProductBatch.job(jobRepository);
 
         // Then
         assertNotNull(job);
-        assertEquals(BatchConstants.SAMPLE_JOB_NAME, job.getName());
+        assertEquals(BatchConstants.ORDER_PRODUCT_JOB_NAME, job.getName());
     }
 
     @Test
     void testStepCreation() {
         // When
-        Step step = sampleBatch.step1(jobRepository);
+        Step step = orderProductBatch.step1(jobRepository);
 
         // Then
         assertNotNull(step);
-        assertEquals(BatchConstants.SAMPLE_JOB_STEP, step.getName());
+        assertEquals(BatchConstants.ORDER_PRODUCT_JOB_STEP, step.getName());
     }
 
     @Test
     void testItemReaderConfiguration() {
         // When
-        RepositoryItemReader<Product> reader = sampleBatch.ItemReader();
+        RepositoryItemReader<Product> reader = orderProductBatch.ItemReader();
 
         // Then
         assertNotNull(reader);
         assertEquals(productRepository, ReflectionTestUtils.getField(reader, "repository"));
-        assertEquals("findAllByQuantityLessThanEqual", ReflectionTestUtils.getField(reader, "methodName"));
+        assertEquals("findAllByQuantityLessThan", ReflectionTestUtils.getField(reader, "methodName"));
         assertEquals(20, ReflectionTestUtils.getField(reader, "pageSize"));
     }
 
     @Test
     void testItemWriterConfiguration() {
         // When
-        RepositoryItemWriter<Order> writer = sampleBatch.ItemWriter();
+        ItemWriter<Order> writer = orderProductBatch.ItemWriter();
 
         // Then
         assertNotNull(writer);
@@ -131,7 +131,7 @@ public class SampleBatchTest {
     @Test
     void testItemProcessorLogic() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = sampleBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
 
         // When
         Order result = processor.process(testProduct);
@@ -141,13 +141,13 @@ public class SampleBatchTest {
         assertNotNull(result.getProducts());
         assertEquals(1, result.getProducts().size());
         assertEquals(testProduct, result.getProducts().get(0));
-        assertEquals(result, testProduct.getOrderId());
+        assertEquals(result, testProduct.getOrder());
     }
 
     @Test
     void testItemProcessorWithNullInput() {
         // Given
-        ItemProcessor<Product, Order> processor = sampleBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
 
         // When & Then
         assertThrows(NullPointerException.class, () -> processor.process(null));
@@ -156,7 +156,7 @@ public class SampleBatchTest {
     @Test
     void testItemProcessorWithDifferentQuantities() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = sampleBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
 
         Product lowQuantityProduct = new Product();
         lowQuantityProduct.setId(3L);
@@ -177,14 +177,14 @@ public class SampleBatchTest {
     void testRepositoryInteraction() {
         // Given
         Page<Product> productPage = new PageImpl<>(testProducts);
-        lenient().when(productRepository.findAllByQuantityLessThanEqual(eq(100), any(Pageable.class)))
+        lenient().when(productRepository.findAllByQuantityLessThan(eq(100), any(Pageable.class)))
                 .thenReturn(productPage);
 
-        RepositoryItemReader<Product> reader = sampleBatch.ItemReader();
+        RepositoryItemReader<Product> reader = orderProductBatch.ItemReader();
 
         // Simulate reader initialization
         ReflectionTestUtils.setField(reader, "repository", productRepository);
-        ReflectionTestUtils.setField(reader, "methodName", "findAllByQuantityLessThanEqual");
+        ReflectionTestUtils.setField(reader, "methodName", "findAllByQuantityLessThan");
         ReflectionTestUtils.setField(reader, "arguments", List.of(100));
 
         // When
@@ -192,19 +192,19 @@ public class SampleBatchTest {
         // We're testing the configuration here
 
         // Then
-        verify(productRepository, never()).findAllByQuantityLessThanEqual(anyInt(), any(Pageable.class));
+        verify(productRepository, never()).findAllByQuantityLessThan(anyInt(), any(Pageable.class));
 
         // Verify the reader is properly configured
-        assertEquals("findAllByQuantityLessThanEqual", ReflectionTestUtils.getField(reader, "methodName"));
+        assertEquals("findAllByQuantityLessThan", ReflectionTestUtils.getField(reader, "methodName"));
     }
 
     @Test
     void testBatchConfigurationProperties() throws Exception {
         // Given
-        ReflectionTestUtils.setField(sampleBatch, "environment", environment);
+        ReflectionTestUtils.setField(orderProductBatch, "environment", environment);
 
         // When
-        sampleBatch.afterPropertiesSet();
+        orderProductBatch.afterPropertiesSet();
 
         // Then
         verify(environment).getProperty("batch.default.core-pool-size", Integer.class);
@@ -215,7 +215,7 @@ public class SampleBatchTest {
     @Test
     void testTransactionManagerBean() {
         // When
-        var transactionManager = sampleBatch.transactionManager();
+        var transactionManager = orderProductBatch.getTransactionManager();
 
         // Then
         assertNotNull(transactionManager);
@@ -226,7 +226,7 @@ public class SampleBatchTest {
     @Test
     void testPageSizeConstant() {
         // When
-        Integer pageSize = (Integer) ReflectionTestUtils.getField(SampleBatch.class, "PAGE_SIZE");
+        Integer pageSize = (Integer) ReflectionTestUtils.getField(OrderProductBatch.class, "PAGE_SIZE");
 
         // Then
         assertEquals(20, pageSize);
@@ -235,7 +235,7 @@ public class SampleBatchTest {
     @Test
     void testOrderCreationInProcessor() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = sampleBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
         Product product = new Product();
         product.setId(5L);
         product.setName("Test Product");
@@ -249,13 +249,13 @@ public class SampleBatchTest {
         assertNotNull(order.getProducts());
         assertFalse(order.getProducts().isEmpty());
         assertEquals(product, order.getProducts().get(0));
-        assertEquals(order, product.getOrderId());
+        assertEquals(order, product.getOrder());
     }
 
     @Test
     void testMultipleProductsProcessing() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = sampleBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
 
         // When
         Order order1 = processor.process(testProducts.get(0));
