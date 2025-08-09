@@ -3,7 +3,7 @@ package org.hamit.batchdemo.batch;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.hamit.batchdemo.batch.base.BaseBatch;
+import org.hamit.batchdemo.batch.base.BaseAbstractBatch;
 import org.hamit.batchdemo.batch.orderProduct.steps.OrderStep;
 import org.hamit.batchdemo.dao.entity.Order;
 import org.hamit.batchdemo.dao.entity.Product;
@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class OrderProductBatch extends BaseBatch<Product, Order> {
+public class OrderProductBatch extends BaseAbstractBatch<Product, Order> {
     static final Integer PAGE_SIZE = 20;
     private final OrderStep orderStep;
 

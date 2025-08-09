@@ -2,6 +2,7 @@ package org.hamit.batchdemo.batch.orderProduct.steps;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.hamit.batchdemo.batch.base.BaseAbstractStep;
 import org.hamit.batchdemo.batch.orderProduct.writers.OrderProductWriter;
 import org.hamit.batchdemo.dao.entity.Order;
 import org.hamit.batchdemo.dao.entity.Product;
@@ -19,10 +20,11 @@ import java.util.Map;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class OrderStep {
+public class OrderStep extends BaseAbstractStep<Product, Order> {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
+    @Override
     public RepositoryItemReader<Product> getReader(Integer PAGE_SIZE) {
         RepositoryItemReader<Product> reader = new RepositoryItemReader<>();
         reader.setRepository(productRepository);
@@ -33,6 +35,7 @@ public class OrderStep {
         return reader;
     }
 
+    @Override
     public ItemProcessor<Product, Order> getProcessor() {
         return item -> {
             log.info("ITEM QUANTITY BELOW 100, CURRENT QUANTITY: {} , ID : {}", item.getQuantity(), item.getId());
@@ -42,6 +45,7 @@ public class OrderStep {
         };
     }
 
+    @Override
     public ItemWriter<Order> getWriter() {
         return new OrderProductWriter(productRepository, orderRepository);
     }

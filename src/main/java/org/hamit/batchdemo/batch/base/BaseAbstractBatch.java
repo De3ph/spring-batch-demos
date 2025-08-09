@@ -13,8 +13,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public abstract class BaseBatch<R, W> extends BaseListeners<R, W> implements InitializingBean {
-    private static final Logger log = LoggerFactory.getLogger(BaseBatch.class);
+public abstract class BaseAbstractBatch<R, W> extends BaseAbstractListeners<R, W> implements InitializingBean {
+    private static final Logger log = LoggerFactory.getLogger(BaseAbstractBatch.class);
     @Autowired
     private Environment environment;
     private BatchConfigDTO batchConfig;

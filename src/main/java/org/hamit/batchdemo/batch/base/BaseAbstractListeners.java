@@ -13,8 +13,8 @@ import org.springframework.batch.item.Chunk;
 
 import lombok.NonNull;
 
-public abstract class BaseListeners<R, W> {
-    private static final Logger log = LoggerFactory.getLogger(BaseListeners.class);
+public abstract class BaseAbstractListeners<R, W> {
+    private static final Logger log = LoggerFactory.getLogger(BaseAbstractListeners.class);
 
     public JobExecutionListener jobExecutionListener() {
         return new JobExecutionListener() {

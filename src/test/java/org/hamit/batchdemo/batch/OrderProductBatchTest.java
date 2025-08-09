@@ -102,7 +102,7 @@ public class OrderProductBatchTest {
     @Test
     void testStepCreation() {
         // When
-        Step step = orderProductBatch.step1(jobRepository);
+        Step step = orderProductBatch.orderStep(jobRepository);
 
         // Then
         assertNotNull(step);
