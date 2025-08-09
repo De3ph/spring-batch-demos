@@ -1,5 +1,6 @@
 package org.hamit.batchdemo.batch;
 
+import org.hamit.batchdemo.batch.orderProduct.steps.OrderStep;
 import org.hamit.batchdemo.dao.entity.Order;
 import org.hamit.batchdemo.dao.entity.Product;
 import org.hamit.batchdemo.dao.repository.OrderRepository;
@@ -43,6 +44,9 @@ public class OrderProductBatchTest {
 
     @Mock
     private Environment environment;
+
+    @Mock
+    OrderStep orderStep;
 
     @InjectMocks
     private OrderProductBatch orderProductBatch;
@@ -108,7 +112,7 @@ public class OrderProductBatchTest {
     @Test
     void testItemReaderConfiguration() {
         // When
-        RepositoryItemReader<Product> reader = orderProductBatch.ItemReader();
+        RepositoryItemReader<Product> reader = orderStep.getReader(20);
 
         // Then
         assertNotNull(reader);
@@ -120,7 +124,7 @@ public class OrderProductBatchTest {
     @Test
     void testItemWriterConfiguration() {
         // When
-        ItemWriter<Order> writer = orderProductBatch.ItemWriter();
+        ItemWriter<Order> writer = orderStep.getWriter();
 
         // Then
         assertNotNull(writer);
@@ -131,7 +135,7 @@ public class OrderProductBatchTest {
     @Test
     void testItemProcessorLogic() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderStep.getProcessor();
 
         // When
         Order result = processor.process(testProduct);
@@ -147,7 +151,7 @@ public class OrderProductBatchTest {
     @Test
     void testItemProcessorWithNullInput() {
         // Given
-        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderStep.getProcessor();
 
         // When & Then
         assertThrows(NullPointerException.class, () -> processor.process(null));
@@ -156,7 +160,7 @@ public class OrderProductBatchTest {
     @Test
     void testItemProcessorWithDifferentQuantities() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderStep.getProcessor();
 
         Product lowQuantityProduct = new Product();
         lowQuantityProduct.setId(3L);
@@ -180,7 +184,7 @@ public class OrderProductBatchTest {
         lenient().when(productRepository.findAllByQuantityLessThan(eq(100), any(Pageable.class)))
                 .thenReturn(productPage);
 
-        RepositoryItemReader<Product> reader = orderProductBatch.ItemReader();
+        RepositoryItemReader<Product> reader = orderStep.getReader(20);
 
         // Simulate reader initialization
         ReflectionTestUtils.setField(reader, "repository", productRepository);
@@ -235,7 +239,7 @@ public class OrderProductBatchTest {
     @Test
     void testOrderCreationInProcessor() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderStep.getProcessor();
         Product product = new Product();
         product.setId(5L);
         product.setName("Test Product");
@@ -255,7 +259,7 @@ public class OrderProductBatchTest {
     @Test
     void testMultipleProductsProcessing() throws Exception {
         // Given
-        ItemProcessor<Product, Order> processor = orderProductBatch.ItemProcessor();
+        ItemProcessor<Product, Order> processor = orderStep.getProcessor();
 
         // When
         Order order1 = processor.process(testProducts.get(0));

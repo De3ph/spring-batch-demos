@@ -23,7 +23,6 @@ public abstract class BaseBatch<R, W> extends BaseListeners<R, W> implements Ini
     @Getter
     PlatformTransactionManager transactionManager;
 
-
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
