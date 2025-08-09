@@ -1,5 +1,6 @@
 package org.hamit.batchdemo.batch.base;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -8,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -17,13 +17,12 @@ public abstract class BaseBatch<R, W> extends BaseListeners<R, W> implements Ini
     private static final Logger log = LoggerFactory.getLogger(BaseBatch.class);
     @Autowired
     private Environment environment;
-
     private BatchConfigDTO batchConfig;
 
-    @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new JpaTransactionManager();
-    }
+    @Autowired
+    @Getter
+    PlatformTransactionManager transactionManager;
+
 
     @Bean
     public TaskExecutor taskExecutor() {

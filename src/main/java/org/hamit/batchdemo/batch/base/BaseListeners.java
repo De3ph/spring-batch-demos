@@ -19,7 +19,7 @@ public abstract class BaseListeners<R, W> {
     public JobExecutionListener jobExecutionListener() {
         return new JobExecutionListener() {
             @Override
-            public void beforeJob(JobExecution jobExecution) {
+            public void beforeJob(@NonNull JobExecution jobExecution) {
                 log.info("{} job execution starting...", jobExecution.getJobInstance().getJobName());
             }
 
