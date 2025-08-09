@@ -34,7 +34,7 @@ public abstract class BaseAbstractBatch<R, W> extends BaseAbstractListeners<R, W
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         log.info("Batch initialized : {}", this.getClass().getSimpleName());
         batchConfig = getBatchConfig();
     }
