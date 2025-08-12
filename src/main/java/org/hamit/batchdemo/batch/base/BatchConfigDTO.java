@@ -1,7 +1,9 @@
 package org.hamit.batchdemo.batch.base;
 
 public record BatchConfigDTO(
-        Integer corePoolSize,
-        Integer maxPoolSize,
-        Integer queueCapacity) {
+        int corePoolSize,
+        int maxPoolSize,
+        int queueCapacity,
+        int chunkSize
+) {
 }

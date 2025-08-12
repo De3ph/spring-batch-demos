@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableBatchProcessing
 @RequiredArgsConstructor
 public class OrderProductBatch extends BaseAbstractBatch<Product, Order> {
-    static final Integer PAGE_SIZE = 20;
     private final OrderStep orderStep;
 
     @Bean(BatchConstants.JobNames.ORDER_PRODUCT_JOB)
@@ -37,9 +36,9 @@ public class OrderProductBatch extends BaseAbstractBatch<Product, Order> {
     @Bean(BatchConstants.StepNames.ORDER_PRODUCT_STEP)
     public Step orderStep(JobRepository jobRepository) {
         return new StepBuilder(BatchConstants.StepNames.ORDER_PRODUCT_STEP, jobRepository)
-                .<Product, Order>chunk(PAGE_SIZE, getTransactionManager())
+                .<Product, Order>chunk(getBatchProperties().chunkSize(), getTransactionManager())
                 .listener(stepExecutionListener())
-                .reader(orderStep.getReader(PAGE_SIZE))
+                .reader(orderStep.getReader(getBatchProperties().chunkSize()))
                 .processor(orderStep.getProcessor())
                 .writer(orderStep.getWriter())
                 .listener(getItemReadListener())

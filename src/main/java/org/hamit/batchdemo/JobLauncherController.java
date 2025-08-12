@@ -31,7 +31,7 @@ public class JobLauncherController {
     private final JobLauncher jobLauncher;
     private final JobExplorer jobExplorer;
 
-    @Qualifier(value = BatchConstants.ORDER_PRODUCT_JOB_NAME)
+    @Qualifier(value = BatchConstants.JobNames.ORDER_PRODUCT_JOB)
     private final Job orderProductBatch;
 
     @GetMapping("/order-job")
@@ -69,7 +69,7 @@ public class JobLauncherController {
     })
     public ResponseEntity<String> getJobStatus() {
         try {
-            var jobInstances = jobExplorer.getJobInstances(BatchConstants.ORDER_PRODUCT_JOB_NAME, 0, 10);
+            var jobInstances = jobExplorer.getJobInstances(BatchConstants.JobNames.ORDER_PRODUCT_JOB, 0, 10);
             if (jobInstances.isEmpty()) {
                 return ResponseEntity.ok("No job instances found");
             }

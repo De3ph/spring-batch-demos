@@ -28,6 +28,7 @@ batch:
     core-pool-size: 5
     max-pool-size: 10
     queue-capacity: 25
+    chunk-size: 20
 
 # OpenAPI/Swagger Configuration
 springdoc:

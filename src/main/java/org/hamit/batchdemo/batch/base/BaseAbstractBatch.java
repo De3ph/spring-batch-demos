@@ -17,7 +17,8 @@ public abstract class BaseAbstractBatch<R, W> extends BaseAbstractListeners<R, W
     private static final Logger log = LoggerFactory.getLogger(BaseAbstractBatch.class);
     @Autowired
     private Environment environment;
-    private BatchConfigDTO batchConfig;
+    @Getter
+    private BatchConfigDTO batchProperties;
 
     @Autowired
     @Getter
@@ -26,24 +27,26 @@ public abstract class BaseAbstractBatch<R, W> extends BaseAbstractListeners<R, W
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(batchConfig.corePoolSize());
-        taskExecutor.setMaxPoolSize(batchConfig.maxPoolSize());
-        taskExecutor.setQueueCapacity(batchConfig.queueCapacity());
+        taskExecutor.setCorePoolSize(batchProperties.corePoolSize());
+        taskExecutor.setMaxPoolSize(batchProperties.maxPoolSize());
+        taskExecutor.setQueueCapacity(batchProperties.queueCapacity());
 
         return taskExecutor;
     }
 
     @Override
     public void afterPropertiesSet() {
-        log.info("Batch initialized : {}", this.getClass().getSimpleName());
-        batchConfig = getBatchConfig();
+        log.info("{} initialized.", this.getClass().getSimpleName());
+        batchProperties = getPropertiesFromEnv();
     }
 
-    public BatchConfigDTO getBatchConfig() {
+    private BatchConfigDTO getPropertiesFromEnv() {
         return new BatchConfigDTO(
                 getBatchConfigProperty("core-pool-size", Integer.class),
                 getBatchConfigProperty("max-pool-size", Integer.class),
-                getBatchConfigProperty("queue-capacity", Integer.class));
+                getBatchConfigProperty("queue-capacity", Integer.class),
+                getBatchConfigProperty("chunk-size", Integer.class)
+                );
     }
 
     public <T> T getBatchConfigProperty(String property, Class<T> type) {
