@@ -50,6 +50,13 @@ public abstract class BaseAbstractBatch<R, W> extends BaseAbstractListeners<R, W
         return environment.getProperty("batch." + getBatchConfigPrefix() + "." + property, type);
     }
 
+    /**
+     * batch property'lerini yml dan okumak için
+     * batch:
+     *  {{batchConfigPrefix}}:
+     *      core-pool-size: 5
+     *      ...
+     */
     public abstract String getBatchConfigPrefix();
 
 }

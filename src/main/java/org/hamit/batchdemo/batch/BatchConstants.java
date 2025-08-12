@@ -1,11 +1,20 @@
 package org.hamit.batchdemo.batch;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BatchConstants {
     public static final String DEFAULT_BATCH_CONFIG_PREFIX = "default";
-    public static final String ORDER_PRODUCT_JOB_NAME = "orderProductJob";
-    public static final String ORDER_PRODUCT_JOB_STEP = "orderProductStep";
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class JobNames {
+        public static final String ORDER_PRODUCT_JOB = "orderProductJob";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class StepNames {
+        public static final String ORDER_PRODUCT_STEP = "orderProductStep";
+    }
+
 }

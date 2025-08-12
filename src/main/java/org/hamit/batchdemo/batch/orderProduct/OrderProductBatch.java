@@ -25,17 +25,18 @@ public class OrderProductBatch extends BaseAbstractBatch<Product, Order> {
     static final Integer PAGE_SIZE = 20;
     private final OrderStep orderStep;
 
-    @Bean(BatchConstants.ORDER_PRODUCT_JOB_NAME)
+    @Bean(BatchConstants.JobNames.ORDER_PRODUCT_JOB)
     public Job job(JobRepository jobRepository) {
-        return new JobBuilder(BatchConstants.ORDER_PRODUCT_JOB_NAME, jobRepository)
+        return new JobBuilder(BatchConstants.JobNames.ORDER_PRODUCT_JOB, jobRepository)
                 .start(orderStep(jobRepository))
                 .listener(jobExecutionListener())
                 .build();
     }
 
     // extracted bean is defined in OrderProductStepConfig
+    @Bean(BatchConstants.StepNames.ORDER_PRODUCT_STEP)
     public Step orderStep(JobRepository jobRepository) {
-        return new StepBuilder(BatchConstants.ORDER_PRODUCT_JOB_STEP, jobRepository)
+        return new StepBuilder(BatchConstants.StepNames.ORDER_PRODUCT_STEP, jobRepository)
                 .<Product, Order>chunk(PAGE_SIZE, getTransactionManager())
                 .listener(stepExecutionListener())
                 .reader(orderStep.getReader(PAGE_SIZE))
